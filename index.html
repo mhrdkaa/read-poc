@@ -16,9 +16,9 @@
         const status = document.getElementById("status");
         let used = false;
 
-        function tryExploit(trigger) {
+        function tryExploit(source) {
             const isActive = navigator.userActivation.isActive;
-            console.log("[*]", trigger, "| isActive:", isActive);
+            console.log("[*]", source, "| isActive:", isActive);
 
             if (isActive && !used) {
                 used = true;
