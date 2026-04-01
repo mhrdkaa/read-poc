@@ -56,7 +56,7 @@
 </div>
 
 <script>
-window.addEventListener('keyup', async (e) => {
+window.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
 
         const status = document.getElementById('status');
@@ -64,22 +64,22 @@ window.addEventListener('keyup', async (e) => {
         console.log("Activation:", navigator.userActivation.isActive);
 
         if (navigator.userActivation.isActive) {
-            try {
-                status.innerText = "Opening file picker...";
-                status.style.color = "green";
-                const [fileHandle] = await window.showOpenFilePicker();
-
-                const file = await fileHandle.getFile();
-
-                status.innerText = "File selected: " + file.name;
-
-                console.log("User selected:", file.name);
-
-            } catch (err) {
-                status.innerText = "User cancelled or blocked";
-                status.style.color = "red";
-                console.error(err);
-            }
+            status.innerText = "Opening file picker...";
+            status.style.color = "green";
+            
+            window.showOpenFilePicker()
+                .then(([fileHandle]) => {
+                    return fileHandle.getFile();
+                })
+                .then((file) => {
+                    status.innerText = "File selected: " + file.name;
+                    console.log("User selected:", file.name);
+                })
+                .catch((err) => {
+                    status.innerText = "User cancelled or blocked";
+                    status.style.color = "red";
+                    console.error(err);
+                });
 
         } else {
             status.innerText = "Activation expired";
